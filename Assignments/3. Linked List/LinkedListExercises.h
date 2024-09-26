@@ -127,7 +127,61 @@ void LinkedList<T>::insertOrdered(const T& newData) {
   // they don't handle the null pointer at the tail properly. Be careful
   // to update all next, prev, head_, and tail_ pointers as needed on your
   // new node or on those existing nodes that are adjacent to the new node.
+  Node *node = new Node(newData);
+  if (!head_)
+  {
+    // If empty, insert as the only item as both head and tail.
+    // The Node already has next and prev set to nullptr by default.
+    head_ = node;
+    tail_ = node;
+  }
+  else 
+  {
+    Node *thru = head_;
 
+    // construct an if for smallest data insertion else the below
+    if (node->data < thru->data)
+    {
+      // std::cout << "entered with newdata " << newData << std::endl;
+      thru->prev = node;
+      node->next = thru;
+      head_ = node;
+      // pushFront(newData);
+    }
+    else
+    {
+      int flag = 0;
+      // travel through the list until thru->data is greater than newData
+      while(thru->data < node->data)
+      {
+        // std::cout << "while entered with newdata " << newData << std::endl;
+        if(thru->next != nullptr)
+          thru=thru->next;
+        else
+        {
+          // pushBack(newData);
+          Node* oldTail = tail_;
+          oldTail->next =  node;
+          node->prev = oldTail;
+          node->next = nullptr;
+          tail_ = node;
+          flag=1;
+          break;
+        }
+      }
+      
+      if (flag==0) // thru->data >= node->data
+      {
+        Node* a = thru->prev;
+        a->next = node;
+        node->prev = thru->prev;
+        node->next = thru;
+        thru->prev = node;
+      }
+    }
+  }
+
+  size_++;
 }
 
 /********************************************************************
@@ -228,6 +282,34 @@ LinkedList<T> LinkedList<T>::merge(const LinkedList<T>& other) const {
   // -----------------------------------------------------------
   // Please implement this function according to the description
   // above and in the instructions PDF.
+
+  while (!left.empty() && !right.empty())
+  {
+    if (left.front() < right.front())
+    {
+      merged.pushBack(left.front());
+      left.popFront();
+    }
+    else
+    {
+      merged.pushBack(right.front());
+      right.popFront();
+    }
+  }
+
+  // If there are any elements remaining in right
+  while (!right.empty())
+  {
+    merged.pushBack(right.front());
+    right.popFront();
+  }
+  
+  // If there are any elements remaining in left
+  while (!left.empty())
+  {
+    merged.pushBack(left.front());
+    left.popFront();
+  }
 
   // Hints:
   // 1. Assuming that the left and right lists are already sorted, remember
